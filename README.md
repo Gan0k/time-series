@@ -1,4 +1,4 @@
-time-series-forecasting
+Time Series Forecasting
 =======================
 
 COMPG15 coursework. 2016.
