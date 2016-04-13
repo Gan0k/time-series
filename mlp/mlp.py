@@ -42,13 +42,11 @@ def load_data(datapath):
     # prepare train, validation and tests sets by sampling randomly
     train_set = tuple([numpy.asmatrix([[d] for d in trainDates]), [normalise(row[2]) for row in trainSet]])
 
-    choices = numpy.random.choice(len(validationDates), 2000, replace=False)
     powervalid = [normalise(row[2]) for row in validationSet]
-    valid_set = tuple([numpy.asmatrix([[validationDates[c]] for c in choices]), [powervalid[c] for c in choices]])
+    valid_set = tuple([numpy.asmatrix([[validationDates[c]] for c in choices]), powervalid[c]])
 
-    choices = numpy.random.choice(len(testDates), 2000, replace=False)
     powertest = [normalise(row[2]) for row in testSet]
-    test_set = tuple([[numpy.asmatrix([testDates[c]]) for c in choices], [powertest[c] for c in choices]])
+    test_set = tuple([[numpy.asmatrix([testDates[c]]) for c in choices], powertest])
 
     return _make_array(train_set), _make_array(valid_set), _make_array(test_set)
 
