@@ -21,7 +21,7 @@ def load_data(datapath):
     :param datapath: the path to the dataset (here MNIST)
     '''
     # read csv and separate data
-    csv = numpy.genfromtxt(datapath, delimiter=";", names=True, dtype=None, missing_values='?')
+    csv = numpy.genfromtxt(datapath, delimiter=";", names=True, dtype=None, missing_values='?', filling_values=0.0)
     trainSet = filter(lambda row: row[0].rpartition('/')[2] == '2007', csv)
     validationSet = filter(lambda row: row[0].rpartition('/')[2] == '2008', csv)
     testSet = filter(lambda row: row[0].rpartition('/')[2] == '2009', csv)
@@ -36,25 +36,40 @@ def load_data(datapath):
     validationDates = map(changedate,validationSet)
     testDates = map(changedate,testSet)
 
+    def normalise (a):
+        return a*1000;
+
     # prepare train, validation and tests sets by sampling randomly
-    train_set = tuple([[numpy.asarray([d],dtype='float_') for d in trainDates], [row[2] for row in trainSet]])
+    train_set = tuple([numpy.asmatrix([[d] for d in trainDates]), [normalise(row[2]) for row in trainSet]])
 
     choices = numpy.random.choice(len(validationDates), 2000, replace=False)
-    powervalid = [row[2] for row in validationSet]
-    valid_set = tuple([[numpy.asarray([validationDates[c]],dtype='float_') for c in choices], [powervalid[c] for c in choices]])
+    powervalid = [normalise(row[2]) for row in validationSet]
+    valid_set = tuple([numpy.asmatrix([[validationDates[c]] for c in choices]), [powervalid[c] for c in choices]])
 
     choices = numpy.random.choice(len(testDates), 2000, replace=False)
-    powertest = [row[2] for row in testSet]
-    test_set = tuple([[numpy.asarray([testDates[c]],dtype='float_') for c in choices], [powertest[c] for c in choices]])
+    powertest = [normalise(row[2]) for row in testSet]
+    test_set = tuple([[numpy.asmatrix([testDates[c]]) for c in choices], [powertest[c] for c in choices]])
+
+    print train_set[0].shape
+    print type(train_set[0][0]), type(train_set[1][0])
+    print train_set[0][0].shape, train_set[1][0]
+    print type(valid_set[0][0]), type(valid_set[1][0])
+    print valid_set[0][0].shape, valid_set[1][0]
+    print type(test_set[0][0]), type(test_set[1][0])
+    print test_set[0][0].shape, test_set[1][0]
 
     return _make_array(train_set), _make_array(valid_set), _make_array(test_set)
 
 
 def _make_array(xy):
     data_x, data_y = xy
-    return zip(
+    print data_x.shape
+    wolo = zip(
         numpy.asarray(data_x, dtype=theano.config.floatX),
-        numpy.asarray(data_y, dtype='float_'))
+        numpy.asarray(data_y, dtype='int32'))
+    print wolo[0][0].shape
+    exit()
+    return wolo
 
 
 def _init_logreg_weights(n_hidden, n_out):
