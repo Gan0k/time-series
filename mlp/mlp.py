@@ -50,26 +50,14 @@ def load_data(datapath):
     powertest = [normalise(row[2]) for row in testSet]
     test_set = tuple([[numpy.asmatrix([testDates[c]]) for c in choices], [powertest[c] for c in choices]])
 
-    print train_set[0].shape
-    print type(train_set[0][0]), type(train_set[1][0])
-    print train_set[0][0].shape, train_set[1][0]
-    print type(valid_set[0][0]), type(valid_set[1][0])
-    print valid_set[0][0].shape, valid_set[1][0]
-    print type(test_set[0][0]), type(test_set[1][0])
-    print test_set[0][0].shape, test_set[1][0]
-
     return _make_array(train_set), _make_array(valid_set), _make_array(test_set)
 
 
 def _make_array(xy):
     data_x, data_y = xy
-    print data_x.shape
-    wolo = zip(
+    return zip(
         numpy.asarray(data_x, dtype=theano.config.floatX),
         numpy.asarray(data_y, dtype='int32'))
-    print wolo[0][0].shape
-    exit()
-    return wolo
 
 
 def _init_logreg_weights(n_hidden, n_out):
@@ -177,7 +165,7 @@ def compile_model(n_in, n_classes, n_hidden, learning_rate, L1_reg, L2_reg):
 
 
 def main(learning_rate=0.01, L1_reg=0.00, L2_reg=0.0001, n_epochs=1000,
-             dataset='uci_dataset/household_power_consumption.txt', n_hidden=500):
+             dataset='../datasets/household_power_consumption.txt', n_hidden=500):
     train_examples, dev_examples, test_examples = load_data(dataset)
     print '... building the model'
     train_model, evaluate_model = compile_model(28*28, 10, n_hidden, learning_rate, L1_reg, L2_reg)
