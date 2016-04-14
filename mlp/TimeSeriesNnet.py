@@ -70,3 +70,4 @@ class TimeSeriesNnet(object):
 			self.timeseries = np.concatenate((self.timeseries, np.exp(self.next_pred[0,:])), axis = 0)
 
 		return self.predictions
+
