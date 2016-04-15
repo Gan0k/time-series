@@ -8,14 +8,23 @@ from sklearn.metrics import mean_squared_error
 csv = numpy.genfromtxt('../datasets/2007.txt', delimiter=";", names=True, dtype=None, missing_values='?')
 time_series = map(lambda row : 0 if numpy.isnan(row[2]) else row[2], filter(lambda row: row[0].rpartition('/')[2] == '2007', csv))
 
+def collapse (ts, ahead):
+    r = []
+    for i in xrange(0,len(ts),ahead):
+        r.append(max(ts[i:i+ahead-1]))
+    return r
+
+nahead = 24
+time_series = collapse(time_series,nahead)
+
 time_series = np.array(time_series,dtype='int32')
 neural_net = TimeSeriesNnet(hidden_layers = [20, 15, 5], activation_functions = ['sigmoid', 'sigmoid', 'sigmoid'])
 neural_net.fit(time_series, lag = 1, epochs = 1000)
-neural_net.predict_ahead(n_ahead = 30)
+neural_net.predict_ahead(n_ahead = nahead)
 
 # RMSE Training error
-# mse = mean_squared_error(neural_net.time_series - time_series)
-# print numpy.sqrt(mse)
+mse = mean_squared_error(time_series, neural_net.timeseries)
+print numpy.sqrt(mse)
 
 plt.plot(range(len(neural_net.timeseries)), neural_net.timeseries, '-r', label='Predictions', linewidth=1)
 plt.plot(range(len(time_series)), time_series, '-g',  label='Original series')
