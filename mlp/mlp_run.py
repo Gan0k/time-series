@@ -28,8 +28,8 @@ neural_net.fit(time_series, lag=4, epochs=500)
 neural_net.predict_year(test_series)
 
 # RMSE Training error
-mse = mean_squared_error(test_series, neural_net.predictions)
-print numpy.sqrt(mse)
+rmse = mean_squared_error(test_series, neural_net.predictions)**0.5
+print rmse
 
 plt.plot(range(len(neural_net.predictions)), neural_net.predictions, '-r', label='Predictions', linewidth=1)
 plt.plot(range(len(test_series)), test_series, '-g',  label='Original series')
