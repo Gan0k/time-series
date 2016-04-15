@@ -24,16 +24,13 @@ test_series = collapse(test_series,hours)
 time_series = np.array(time_series,dtype='int32')
 
 neural_net = TimeSeriesNnet(hidden_layers = [20, 15, 5], activation_functions = ['sigmoid', 'sigmoid', 'sigmoid'])
+neural_net.fit(time_series, lag=4, epochs=500)
+neural_net.predict_year(test_series)
 
-for l in range(1,5):
-    neural_net.fit(time_series, lag=l, epochs=500)
-    neural_net.predict_year(test_series)
+# RMSE Training error
+rmse = mean_squared_error(test_series, neural_net.predictions)**0.5
+print rmse
 
-    # RMSE Training error
-    rmse = mean_squared_error(test_series, neural_net.predictions)**0.5
-    print 'Lag:', l, 'RMSE:', rmse
-
-exit()
 plt.plot(range(len(neural_net.predictions)), neural_net.predictions, '-r', label='Predictions', linewidth=1)
 plt.plot(range(len(test_series)), test_series, '-g',  label='Original series')
 plt.title("")
