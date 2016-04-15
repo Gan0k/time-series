@@ -18,12 +18,14 @@ nahead = 24
 time_series = collapse(time_series,nahead)
 
 time_series = np.array(time_series,dtype='int32')
+trainset, testset = time_series[0:-nahead], time_series[-nahead:]
+
 neural_net = TimeSeriesNnet(hidden_layers = [20, 15, 5], activation_functions = ['sigmoid', 'sigmoid', 'sigmoid'])
-neural_net.fit(time_series, lag = 1, epochs = 1000)
+neural_net.fit(trainset, lag = 1, epochs = 1000)
 neural_net.predict_ahead(n_ahead = nahead)
 
 # RMSE Training error
-mse = mean_squared_error(time_series, neural_net.timeseries)
+mse = mean_squared_error(testset, neural_net.timeseries[-nahead:])
 print numpy.sqrt(mse)
 
 plt.plot(range(len(neural_net.timeseries)), neural_net.timeseries, '-r', label='Predictions', linewidth=1)
