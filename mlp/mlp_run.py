@@ -40,8 +40,9 @@ neural_net.predict_year(test_series2)
 rmse = mean_squared_error(test_series2, neural_net.predictions)**0.5
 print rmse
 
-plt.plot(range(len(neural_net.predictions)), neural_net.predictions, '-r', label='Predictions', linewidth=1)
-plt.plot(range(len(test_series2)), test_series2, '-g',  label='Original series')
+window = 24*7;
+plt.plot(range(len(neural_net.predictions[:window])), neural_net.predictions[:window], '-r', label='Predictions', linewidth=1)
+plt.plot(range(len(test_series2[:window])), test_series2[:window], '-g',  label='Original series')
 plt.title("")
 plt.xlabel("")
 plt.ylabel("")
