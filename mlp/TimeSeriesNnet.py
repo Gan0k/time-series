@@ -24,7 +24,7 @@ class TimeSeriesNnet(object):
         if self.lag >= self.n:
             raise ValueError("Lag is higher than length of the timeseries")
         self.X = np.zeros((self.n - self.lag, self.lag), dtype = "float64")
-        self.y = np.log(self.timeseries[self.lag:])
+        self.y = self.timeseries[self.lag:]
         self.epochs = epochs
         self.scaler = StandardScaler()
         self.verbose = verbose
@@ -33,10 +33,6 @@ class TimeSeriesNnet(object):
         # Building X matrix
         for i in range(0, self.n - lag):
             self.X[i, :] = self.timeseries[range(i, i + lag)]
-
-        print "Scaling data"
-        self.scaler.fit(self.X)
-        self.X = self.scaler.transform(self.X)
 
         print "Checking network consistency"
         # Neural net architecture
@@ -64,9 +60,9 @@ class TimeSeriesNnet(object):
         for i in range(n_ahead):
             self.current_x = self.timeseries[-self.lag:]
             self.current_x = self.current_x.reshape((1, self.lag))
-            self.current_x = self.scaler.transform(self.current_x)
+            #self.current_x = self.scaler.transform(self.current_x)
             self.next_pred = self.nn.predict(self.current_x)
-            self.predictions[i] = np.exp(self.next_pred[0, 0])
+            self.predictions[i] = self.next_pred[0, 0]
             self.timeseries = np.concatenate((self.timeseries, np.exp(self.next_pred[0,:])), axis = 0)
 
         return self.predictions
@@ -74,20 +70,17 @@ class TimeSeriesNnet(object):
     def predict_year(self, inp):
         print 'Predicting values'
 
-        self.predictions = np.zeros(len(inp))
         inp = np.array(inp, dtype='float64')
         tempX = np.zeros((len(inp) - self.lag, self.lag), dtype = "float64")
+        self.predictions = np.zeros(tempX.shape[0])
 
         for i in range(0, len(inp) - self.lag):
             tempX[i, :] = inp[range(i, i + self.lag)]
 
-        self.scaler.fit(tempX)
-        tempX = self.scaler.transform(tempX)
-
         for i in xrange(tempX.shape[0]):
             self.current_x = tempX[i,:].reshape((1, self.lag))
             self.next_pred = self.nn.predict(self.current_x)
-            self.predictions[i] = np.exp(self.next_pred[0, 0])
+            self.predictions[i] = self.next_pred[0, 0]
 
         return self.predictions
 

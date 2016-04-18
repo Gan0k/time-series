@@ -11,9 +11,6 @@ time_series = map(lambda row : 0 if numpy.isnan(row[2]) else row[2], filter(lamb
 csv = numpy.genfromtxt('../datasets/2008.txt', delimiter=";", names=True, dtype=None, missing_values='?')
 test_series = map(lambda row : 0 if numpy.isnan(row[2]) else row[2], filter(lambda row: row[0].rpartition('/')[2] == '2008', csv))
 
-csv = numpy.genfromtxt('../datasets/2009.txt', delimiter=";", names=True, dtype=None, missing_values='?')
-test_series2 = map(lambda row : 0 if numpy.isnan(row[2]) else row[2], filter(lambda row: row[0].rpartition('/')[2] == '2009', csv))
-
 def collapse (ts, ahead):
     r = []
     for i in xrange(0,len(ts),ahead):
@@ -23,26 +20,26 @@ def collapse (ts, ahead):
 hours = 60
 time_series = collapse(time_series,hours)
 test_series = collapse(test_series,hours)
-test_series2 = collapse(test_series2,hours)
 
 time_series = np.array(time_series,dtype='float64')
+time_series = (time_series - time_series.mean()) / time_series.std()
 
-neural_net = TimeSeriesNnet(hidden_layers = [2], activation_functions = ['sigmoid'])
+test_series = np.array(test_series,dtype='float64')
+test_series = (test_series - test_series.mean()) / test_series.std()
+
+neural_net = TimeSeriesNnet(hidden_layers = [20,15,5], activation_functions = ['sigmoid','sigmoid','sigmoid'])
 neural_net.fit(time_series, lag=1, epochs=500)
 
-neural_net.predict_year(test_series)
+neural_net.predict_ahead(len(test_series))
 # RMSE Training error
+#lag = 1
+#test_series = test_series[lag:]
 rmse = mean_squared_error(test_series, neural_net.predictions)**0.5
-print rmse
-
-neural_net.predict_year(test_series2)
-# RMSE Training error
-rmse = mean_squared_error(test_series2, neural_net.predictions)**0.5
 print rmse
 
 window = 24*7;
 plt.plot(range(len(neural_net.predictions[:window])), neural_net.predictions[:window], '-r', label='Predictions', linewidth=1)
-plt.plot(range(len(test_series2[:window])), test_series2[:window], '-g',  label='Original series')
+plt.plot(range(len(test_series[:window])), test_series[:window], '-g',  label='Original series')
 plt.title("")
 plt.xlabel("")
 plt.ylabel("")
